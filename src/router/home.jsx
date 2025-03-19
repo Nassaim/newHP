@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../css/home.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
 
 
   // 회원가입 정보 대신 localStorage
   useEffect(() => {
-      localStorage.clear();
-      localStorage.setItem("test1", "zzzzzz");
-    }, []);
+      //localStorage.clear();
+      //localStorage.setItem("test1", "zzzzzz");
+  }, []);
 
     // const [userId, setUserId] = useState('');
     // const [password, setPassword] = useState('');
@@ -20,9 +20,9 @@ const Home = () => {
       password : '',
     })
 
-    const nameFocus = useRef();
-    const passFocus = useRef();
-    const signupNavigate = useNavigate();
+    const focusId = useRef();
+    const focusPass = useRef();
+    const pageNavigate = useNavigate();
 
     // 로그인 정보 입력
     const getLoginInfoHandler = (e) => {
@@ -38,32 +38,43 @@ const Home = () => {
     const submitHandler = () => {
 
       if (loginInfo.userId.length < 2) {
-        alert('이름은 최소 2글자 이상 입력해주세요.');
-        nameFocus.current.focus();
+        alert('아이디는 최소 2글자 이상 입력해주세요.');
+        focusId.current.focus();
         return;
       }
 
       if (loginInfo.password.length < 5) {
         alert('패스워드는 6글자 이상 입력해주세요.');
-        passFocus.current.focus();
+        focusPass.current.focus();
         return;
       }
 
-      console.log("로컬 스토리지 내용 확인 >> ", localStorage);
-      console.log(loginInfo);
+      const memInfo = JSON.parse(localStorage.getItem(loginInfo.userId));
 
-      // 로그인 - 패스워드 확인
-      if (localStorage.getItem(loginInfo.userId) === loginInfo.password) {
-        alert("로그인 성공!");
-      } else if (localStorage.getItem(loginInfo.userId) === null) {
-        alert("가입한 이력이 없는 아이디입니다.");
-      } else {
-        alert("비밀번호를 확인해주세요.");
-      }
+        // 로그인 - 패스워드 확인
+        if (memInfo != null && memInfo.password === loginInfo.password ) {
+          alert("로그인 성공!");
+        } else if (memInfo === null) {
+          alert("가입한 이력이 없는 아이디입니다.");
+          focusId.current.focus();
+          return;
+
+        } else {
+          alert("비밀번호를 확인해주세요.");
+          focusPass.current.focus();
+          return;
+        }
+
+        naviMyPageHandler();
+
+    }
+
+    const naviMyPageHandler = () => {
+      pageNavigate("/mypage")
     }
 
     const naviSignupHandler = () => {
-      signupNavigate("/signup");
+      pageNavigate("/signup");
     }
 
 
@@ -79,8 +90,8 @@ const Home = () => {
       </h4>
 
       <div className="login">
-        <input name="userId" ref={nameFocus}  placeholder="아이디를 입력해주세요." onChange={getLoginInfoHandler} />
-        <input name="password" ref={passFocus} placeholder="비밀번호를 입력해주세요." type="password"  onChange={getLoginInfoHandler}  />
+        <input name="userId" ref={focusId}  placeholder="아이디를 입력해주세요." onChange={getLoginInfoHandler} />
+        <input name="password" ref={focusPass} placeholder="비밀번호를 입력해주세요." type="password"  onChange={getLoginInfoHandler}  />
         <button className="loginBtn" onClick={submitHandler}>로그인</button>
       </div>
 
