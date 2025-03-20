@@ -1,12 +1,75 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import "../css/mypage.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import Modal from "./modal";
 
 const Mypage = () => {
   const [status, setStatus] = useState(false); // true:수정 false:view
+  const [modal, setModal] = useState(false); // true: on false :off
+  const [modifyInfo, setModifyInfo] = useState({
+      userId : '',
+      password : '', 
+      // birthDay : '',
+      // gender : '',
+      // nickName : '',
+      // bio : '',
+      // introduction : '',
+      
+  });
+  
+  // 로그인 정보
+  const location = useLocation();
+  const loginInfo = {...location.state};
+  // 회원 정보
+  const userInfo = JSON.parse(localStorage.getItem(loginInfo.userId));
 
+  const focusNickName = useRef();
+
+
+  //console.log("내용 확인 userInfo=== ''>> ", userInfo);
   const statusToggle = useCallback(() => {
+
     setStatus(!status);
   }, [status]);
+
+  const modalHandler = useCallback(() => {
+
+    console.log('modal 핸들러 클릭' , modal);
+
+    setModal(!modal);
+  }, [modal]);
+
+  const getModifyInfoHandler = (e) => {
+    setModifyInfo({
+       ...modifyInfo, 
+      [e.target.name] : e.target.value
+
+    });
+  }
+
+  const submitModify = () => {
+
+    modalHandler();
+
+    console.log("수정버튼클릭");
+    console.log("modifyInfo 내용 확인 modifyInfo=== ''>> ", modifyInfo);
+
+    let userId = userInfo.userId;
+    modifyInfo.userId = userId
+    modifyInfo.password = userInfo.password
+
+    // 안에 데이터만 수정하는 것 불가로 지우고 다시 입력하는 걸로..
+    localStorage.setItem(userId, JSON.stringify(modifyInfo));
+
+
+    // if (modifyInfo.nickName == "" ) {
+    //   alert('닉네임을 입력해주세요.');
+    //   focusNickName.current.focus();
+    //   return;
+    // } 
+
+  }
+
 
   return (
     <section className="mypage">
@@ -17,7 +80,7 @@ const Mypage = () => {
           <div className="nickname">
             <h1>환영합니다!</h1>
             <p>
-              nickname <span>님</span>
+              {userInfo.nickName === '' || userInfo.nickName === undefined ? userInfo.userId : userInfo.nickName} <span>님</span>
             </p>
           </div>
         </div>
@@ -63,11 +126,13 @@ const Mypage = () => {
       </article>
       <article className="content">
         <div className="title">
-          <h1>프로필관리</h1>
+          <h1>프로필관리3332</h1>
 
           <div className="icon" onClick={statusToggle}>
+          {/* <div className="icon" onClick={modalHandler}> */}
             {status ? (
-              <svg
+              <svg 
+                onClick={submitModify}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -104,7 +169,7 @@ const Mypage = () => {
           <div className="image">
             <img />
 
-            <div className="icon" id={status ? "visible" : "invisible"}>
+            <div className="icon" id={status ? "visible" : "invisible"}> 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -123,61 +188,78 @@ const Mypage = () => {
           </div>
 
           <div className="nickname">
-            {status ? <input placeholder="nickname" /> : <h1>nickname</h1>}
+            {status ? <input defaultValue={userInfo.nickName} placeholder="nickName" useRef={focusNickName} name="nickName" onChange={getModifyInfoHandler} /> : <h1>{userInfo.nickName === '' || userInfo.nickName === undefined ? userInfo.userId : userInfo.nickName}</h1>}
           </div>
         </div>
 
         <div className="box">
           <h1>생년월일</h1>
           {status ? (
-            <input placeholder="1998.05.30" type="date" />
+            <input placeholder="1998.05.30" defaultValue={userInfo.birthDay} type="date" name="birthDay" onChange={getModifyInfoHandler}/>
           ) : (
-            <div>1998.05.30</div>
+            <div>{userInfo.birthDay}</div>
           )}
         </div>
 
         <div className="box">
           <h1>성별</h1>
           {status ? (
-            <select>
+            <select name="gender" defaultValue={userInfo.gender} onChange={getModifyInfoHandler}>
               <option value="여">여</option>
               <option value="남">남</option>
             </select>
           ) : (
-            <div>여</div>
+            <div>{userInfo.gender}</div>
           )}
         </div>
 
         <div className="box">
           <h1>한줄소개</h1>
           {status ? (
-            <input placeholder="한줄소개가 들어올 곳 입니다." />
+            <input defaultValue={userInfo.bio} placeholder="한줄소개가 들어올 곳 입니다." name="bio" onChange={getModifyInfoHandler}/>
           ) : (
-            <div>한줄소개가 들어올 곳 입니다.</div>
+            <div >{userInfo.bio === '' || userInfo.bio === undefined ? "한줄소개가 들어올 곳 입니다." : userInfo.bio}</div>
           )}
         </div>
 
         <div className="box">
           <h1>소개글</h1>
           {status ? (
-            <textarea placeholder="소개글이 들어올 곳 입니다."></textarea>
+            <textarea name="introduction" defaultValue={userInfo.introduction} onChange={getModifyInfoHandler} placeholder="소개글이 들어올 곳 입니다."></textarea>
           ) : (
-            <div className="textarea">소개글이 들어올 곳 입니다.</div>
+            <div className="textarea">{userInfo.introduction === '' || userInfo.introduction === undefined ? "소개글이 들어올 곳 입니다." : userInfo.introduction}</div>
           )}
         </div>
+        <button onClick={modalHandler}>Open Modal</button>
       </article>
 
-      <article className="confirm">
-        <div className="box">
-          <h1>
-            <span>프로필</span>을 <span>수정</span>하시겠습니까 ?
-          </h1>
-          <div className="btnBox">
-            <button className="ok">수정</button>
-            <button className="cancel">취소</button>
-          </div>
-        </div>
-      </article>
+
+      
+
+      {modal && (
+
+        <Modal>
+
+
+        </Modal>
+
+        // <article className="confirm">
+        //   <div className="box">
+        //     <h1>
+        //       <span>프로필</span>을 <span>수정</span>하시겠습니까 ?
+        //     </h1>
+        //     <div className="btnBox">
+        //       <button className="ok">수정</button>
+        //       <button className="cancel">취소</button>
+        //     </div>
+        //   </div>
+        // </article>
+
+
+       ) }
+
+
+
     </section>
   );
 };

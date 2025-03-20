@@ -17,6 +17,9 @@ const Signup = () => {
       password : '',
       birthDay : '',
       gender : '',
+      nickName : '',
+      bio : '',
+      introduction : '',
       
 
   }) 
@@ -60,7 +63,7 @@ const Signup = () => {
 
     alert("회원가입이 되었습니다!");
 
-    const newUser = {userId : signupInfo.userId, password : signupInfo.password, birthDay : signupInfo.birthDay, gender : signupInfo.gender};
+    const newUser = {userId : signupInfo.userId, password : signupInfo.password, birthDay : signupInfo.birthDay, gender : signupInfo.gender, nickName : '', bio : '', introduction : ''};
     localStorage.setItem(signupInfo.userId, JSON.stringify(newUser));
 
     naviLoginHandler();

@@ -70,7 +70,7 @@ const Home = () => {
     }
 
     const naviMyPageHandler = () => {
-      pageNavigate("/mypage")
+      pageNavigate("/mypage", {state : loginInfo});
     }
 
     const naviSignupHandler = () => {
