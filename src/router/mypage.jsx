@@ -1,19 +1,22 @@
 import React, { useCallback, useRef, useState } from "react";
 import "../css/mypage.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import Modal from "./modal";
 
 const Mypage = () => {
   const [status, setStatus] = useState(false); // true:수정 false:view
-  const [modal, setModal] = useState(false); // true: on false :off
+  const [isOpen, setIsOpen] = useState(false); // true: on false :off
+
+  const modalOpen = () => {
+    setIsOpen(true);
+  };
+
+  const modalClose = () => {
+    setIsOpen(false);
+  }
+
   const [modifyInfo, setModifyInfo] = useState({
       userId : '',
       password : '', 
-      // birthDay : '',
-      // gender : '',
-      // nickName : '',
-      // bio : '',
-      // introduction : '',
       
   });
   
@@ -22,22 +25,24 @@ const Mypage = () => {
   const loginInfo = {...location.state};
   // 회원 정보
   const userInfo = JSON.parse(localStorage.getItem(loginInfo.userId));
-
   const focusNickName = useRef();
 
-
-  //console.log("내용 확인 userInfo=== ''>> ", userInfo);
   const statusToggle = useCallback(() => {
 
-    setStatus(!status);
+    if (status === true){
+      modalOpen();
+     } else {
+      setStatus(!status);
+     }
+ 
   }, [status]);
 
-  const modalHandler = useCallback(() => {
+  // 메뉴 핸들러
+  const menuReset = useCallback(() => {
 
-    console.log('modal 핸들러 클릭' , modal);
+    setStatus(false);
 
-    setModal(!modal);
-  }, [modal]);
+  }, []);
 
   const getModifyInfoHandler = (e) => {
     setModifyInfo({
@@ -49,24 +54,22 @@ const Mypage = () => {
 
   const submitModify = () => {
 
-    modalHandler();
-
-    console.log("수정버튼클릭");
-    console.log("modifyInfo 내용 확인 modifyInfo=== ''>> ", modifyInfo);
-
     let userId = userInfo.userId;
     modifyInfo.userId = userId
     modifyInfo.password = userInfo.password
 
-    // 안에 데이터만 수정하는 것 불가로 지우고 다시 입력하는 걸로..
+    console.log("modifyInfo.nickName>>" , modifyInfo.nickName);
+    if (modifyInfo.nickName === "" || modifyInfo.nickName === undefined) {
+      alert('닉네임을 입력해주세요.');
+      modalClose();
+      focusNickName.current.focus();
+      return;
+    } 
+
     localStorage.setItem(userId, JSON.stringify(modifyInfo));
-
-
-    // if (modifyInfo.nickName == "" ) {
-    //   alert('닉네임을 입력해주세요.');
-    //   focusNickName.current.focus();
-    //   return;
-    // } 
+    
+    modalClose();
+    setStatus(!status);
 
   }
 
@@ -86,7 +89,7 @@ const Mypage = () => {
         </div>
 
         <div className="box">
-          <div className="menu active">
+          <div className="menu active" onClick={menuReset}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -126,13 +129,12 @@ const Mypage = () => {
       </article>
       <article className="content">
         <div className="title">
-          <h1>프로필관리3332</h1>
+          <h1>프로필관리</h1>
 
-          <div className="icon" onClick={statusToggle}>
-          {/* <div className="icon" onClick={modalHandler}> */}
+          <div className="icon" onClick={statusToggle} >
             {status ? (
+              // 수정완료 버튼
               <svg 
-                onClick={submitModify}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -188,7 +190,7 @@ const Mypage = () => {
           </div>
 
           <div className="nickname">
-            {status ? <input defaultValue={userInfo.nickName} placeholder="nickName" useRef={focusNickName} name="nickName" onChange={getModifyInfoHandler} /> : <h1>{userInfo.nickName === '' || userInfo.nickName === undefined ? userInfo.userId : userInfo.nickName}</h1>}
+            {status ? <input defaultValue={userInfo.nickName} placeholder="nickName" ref={focusNickName} name="nickName" onChange={getModifyInfoHandler} /> : <h1>{userInfo.nickName === '' || userInfo.nickName === undefined ? userInfo.userId : userInfo.nickName}</h1>}
           </div>
         </div>
 
@@ -230,35 +232,25 @@ const Mypage = () => {
             <div className="textarea">{userInfo.introduction === '' || userInfo.introduction === undefined ? "소개글이 들어올 곳 입니다." : userInfo.introduction}</div>
           )}
         </div>
-        <button onClick={modalHandler}>Open Modal</button>
       </article>
 
 
-      
-
-      {modal && (
-
-        <Modal>
+      {isOpen && (
 
 
-        </Modal>
-
-        // <article className="confirm">
-        //   <div className="box">
-        //     <h1>
-        //       <span>프로필</span>을 <span>수정</span>하시겠습니까 ?
-        //     </h1>
-        //     <div className="btnBox">
-        //       <button className="ok">수정</button>
-        //       <button className="cancel">취소</button>
-        //     </div>
-        //   </div>
-        // </article>
-
+        <article className="confirm">
+          <div className="box">
+            <h1>
+              <span>프로필</span>을 <span>수정</span>하시겠습니까 ?
+            </h1>
+            <div className="btnBox">
+              <button className="ok" onClick={submitModify}>수정</button>
+              <button className="cancel" onClick={modalClose}>취소</button>
+            </div>
+          </div>
+        </article>
 
        ) }
-
-
 
     </section>
   );

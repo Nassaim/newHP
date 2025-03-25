@@ -6,7 +6,7 @@ import moment from "moment";
 const Signup = () => {
 
   const focusId = useRef();
-  const focustPassword = useRef();
+  const focusPassword = useRef();
   const focusBirthday = useRef();
   const focusGender = useRef();
   const loginNavigate = useNavigate();
@@ -51,7 +51,7 @@ const Signup = () => {
 
     if (signupInfo.password.length < 5) {
       alert('패스워드는 6글자 이상 입력해주세요.');
-      focustPassword.current.focus();
+      focusPassword.current.focus();
       return;
     }
 
@@ -91,7 +91,7 @@ const Signup = () => {
       </div>
       <div className="box">
         <h1>비밀번호</h1>
-        <input name="password" ref={focustPassword} placeholder="비밀번호를 입력해주세요." type="password" onChange={getSignupInfoHandler}/>
+        <input name="password" ref={focusPassword} placeholder="비밀번호를 입력해주세요." type="password" onChange={getSignupInfoHandler}/>
       </div>
       <div className="box">
         <h1>생년월일</h1>
